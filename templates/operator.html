@@ -206,10 +206,25 @@
     padding: 8px 0;
     border-bottom: 1px solid #2a2a4a;
     animation: fadeIn 0.3s ease;
+    align-items: center;
+    justify-content: space-between;
   }
   .answer-item:last-child { border-bottom: none; }
   .answer-name { color: var(--gold); font-weight: 700; font-size: 0.88rem; min-width: 60px; }
-  .answer-text { font-size: 0.95rem; }
+  .answer-text { font-size: 0.95rem; flex: 1; }
+  .answer-approve-btn {
+    background: var(--teal);
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .answer-approve-btn:hover { opacity: 0.8; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; } }
 
   /* ── 사이드바 ── */
@@ -306,17 +321,16 @@
   <!-- 빙고판 -->
   <div class="bingo-grid" id="bingoGrid"></div>
 
-  <!-- 현재 질문 카드 -->
+  <!-- 질문 카드 -->
   <div class="question-card" id="questionCard">
     <div class="q-label" id="qLabel"></div>
     <div class="q-num" id="qNum"></div>
     <div class="q-text" id="qText"></div>
     <div class="q-answer" id="qAnswer"></div>
     <div class="vs-display" id="vsDisplay" style="display:none"></div>
-    <button class="btn-clear" id="btnClear" onclick="clearCurrent()">✓ 이 번호 지우기</button>
   </div>
 
-  <!-- 답변 피드 -->
+  <!-- 답변 피드 (개별 승인 버튼 포함) -->
   <div class="answer-feed" id="answerFeed">
     <h3>LIVE 답변</h3>
     <div id="answerList"></div>
@@ -348,6 +362,7 @@ const TYPE_DOTS = {
 let currentNum = null;
 let clearedNums = new Set();
 let vsVotes = {};
+let game_state = { players: {} };
 
 // ── 빙고판 생성 ──
 function buildGrid() {
@@ -382,7 +397,7 @@ function showQuestion(num, q) {
 
   const ansEl = document.getElementById('qAnswer');
   if (q.answer) {
-    ansEl.textContent = `정답: ${q.answer}`;
+    ansEl.textContent = `📌 정답: ${q.answer}`;
     ansEl.classList.add('visible');
   } else {
     ansEl.classList.remove('visible');
@@ -421,6 +436,10 @@ function renderVs(options, counts) {
   }).join('<div style="display:flex;align-items:center;font-weight:900;font-size:1.2rem;color:var(--muted)">VS</div>');
 }
 
+function approveAnswer(playerSid, num) {
+  socket.emit('approve_answer', { player_sid: playerSid, num });
+}
+
 function clearCurrent() {
   if (!currentNum) return;
   socket.emit('clear_number', { num: currentNum });
@@ -442,7 +461,20 @@ socket.on('new_answer', ({ name, text }) => {
   const list = document.getElementById('answerList');
   const item = document.createElement('div');
   item.className = 'answer-item';
-  item.innerHTML = `<span class="answer-name">${name}</span><span class="answer-text">${text}</span>`;
+  
+  // 플레이어 찾기
+  const player = game_state.players.find(p => p.name === name);
+  const playerSid = player ? player.sid : null;
+  
+  const approveBtn = playerSid && currentNum ? 
+    `<button class="answer-approve-btn" onclick="approveAnswer('${playerSid}', ${currentNum})">승인</button>` 
+    : '';
+  
+  item.innerHTML = `
+    <span class="answer-name">${name}</span>
+    <span class="answer-text">${text}</span>
+    ${approveBtn}
+  `;
   list.prepend(item);
 });
 
@@ -474,6 +506,7 @@ socket.on('number_cleared', ({ num }) => {
 
 socket.on('player_list', (players) => {
   document.getElementById('playerCount').textContent = players.length;
+  game_state.players = players; // 플레이어 목록 저장
   const list = document.getElementById('playerList');
   list.innerHTML = players.map(p =>
     `<div class="player-item"><div class="player-dot"></div>${p.name}</div>`
@@ -496,6 +529,10 @@ socket.on('bingo_alert', ({ name }) => {
   toast.textContent = `🎉 ${name} 빙고!`;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
+});
+
+socket.on('player_approved', ({ player_sid, player_name, num }) => {
+  console.log(`${player_name}님이 #${num}번을 승인받았습니다.`);
 });
 
 socket.on('game_reset', () => {

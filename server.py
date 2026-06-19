@@ -137,21 +137,30 @@ def on_vote_vs(data):
         counts[v] = counts.get(v, 0) + 1
     emit('vs_result', {'votes': counts, 'voter': player['name'], 'choice': option}, broadcast=True)
 
+@socketio.on('approve_answer')
+def on_approve_answer(data):
+    sid = data.get('player_sid')
+    num = int(data['num'])
+    
+    if sid not in game_state['players']:
+        return
+    
+    player = game_state['players'][sid]
+    if num not in player['cleared']:
+        player['cleared'].append(num)
+        bingo = check_bingo(player['board'], player['cleared'])
+        if bingo and not player['bingo']:
+            player['bingo'] = True
+            socketio.emit('bingo_alert', {'name': player['name']}, broadcast=True)
+    
+    emit('player_approved', {'player_sid': sid, 'player_name': player['name'], 'num': num}, broadcast=True)
+    emit('scoreboard', _scoreboard(), broadcast=True)
+
 @socketio.on('clear_number')
 def on_clear_number(data):
     num = int(data['num'])
-    game_state['cleared'].add(num)
     game_state['current_q'] = None
-    # 각 참여자 cleared 업데이트
-    for sid, p in game_state['players'].items():
-        if num not in p['cleared']:
-            p['cleared'].append(num)
-            bingo = check_bingo(p['board'], p['cleared'])
-            if bingo and not p['bingo']:
-                p['bingo'] = True
-                socketio.emit('bingo_alert', {'name': p['name']}, broadcast=True)
     emit('number_cleared', {'num': num}, broadcast=True)
-    emit('scoreboard', _scoreboard(), broadcast=True)
 
 @socketio.on('reset_game')
 def on_reset():
@@ -164,7 +173,7 @@ def on_reset():
 
 # ── 헬퍼 ─────────────────────────────────────────────────────
 def _player_list():
-    return [{'name': p['name']} for p in game_state['players'].values()]
+    return [{'name': p['name'], 'sid': sid} for sid, p in game_state['players'].items()]
 
 def _scoreboard():
     scores = []
