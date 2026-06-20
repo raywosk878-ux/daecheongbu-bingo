@@ -52,7 +52,7 @@
   /* ── 메인 레이아웃 ── */
   main {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1.2fr 2fr 280px;
     gap: 20px;
     padding: 20px;
     flex: 1;
@@ -78,7 +78,7 @@
     border: 2px solid #2a2a4a;
     border-radius: 12px;
     color: var(--text);
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     font-weight: 900;
     cursor: pointer;
     transition: all 0.2s;
@@ -185,9 +185,10 @@
     border-radius: 8px;
     font-size: 1rem;
     animation: slideIn 0.3s ease;
+    line-height: 1.4;
   }
   .answer-name { color: var(--gold); font-weight: 700; }
-  .answer-text { color: var(--text); margin-top: 4px; }
+  .answer-sep { color: var(--muted); margin: 0 4px; }
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
@@ -229,6 +230,40 @@
 
   /* 대기 메시지 */
   .waiting { text-align: center; color: var(--muted); padding: 20px; }
+
+  /* ── 우측 사이드바 ── */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+  }
+  .sidebar-section {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid #2a2a4a;
+  }
+  .sidebar-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .player-item, .score-item {
+    background: var(--surface);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .player-item:last-child, .score-item:last-child { margin-bottom: 0; }
+  .player-dot { width: 6px; height: 6px; background: var(--teal); border-radius: 50%; }
+  .score-badge { margin-left: auto; background: var(--teal); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
 </style>
 </head>
 <body>
@@ -267,6 +302,21 @@
 
     <!-- 답변 피드 -->
     <div class="answers-feed" id="answersFeed"></div>
+  </div>
+
+  <!-- 우측 사이드바 -->
+  <div class="sidebar">
+    <!-- 접속자 -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">접속 중</div>
+      <div id="playerList"></div>
+    </div>
+    
+    <!-- 스코어보드 -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">스코어</div>
+      <div id="scoreList"></div>
+    </div>
   </div>
 </main>
 
@@ -351,7 +401,7 @@ socket.on('new_answer', ({ name, text }) => {
   const feed = document.getElementById('answersFeed');
   const item = document.createElement('div');
   item.className = 'answer-item';
-  item.innerHTML = `<span class="answer-name">${name}</span><span class="answer-text">${text}</span>`;
+  item.innerHTML = `<span class="answer-name">${name}</span><span class="answer-sep">:</span> ${text}`;
   feed.prepend(item);
 });
 
@@ -394,6 +444,20 @@ socket.on('number_cleared', ({ num }) => {
 
 socket.on('player_list', (players) => {
   document.getElementById('playerCount').textContent = players.length;
+  const list = document.getElementById('playerList');
+  list.innerHTML = players.map(p =>
+    `<div class="player-item"><div class="player-dot"></div>${p.name}</div>`
+  ).join('');
+});
+
+socket.on('scoreboard', (scores) => {
+  const list = document.getElementById('scoreList');
+  list.innerHTML = scores.map(s =>
+    `<div class="score-item">
+      <span>${s.name}</span>
+      <span class="score-badge">${s.count}</span>
+    </div>`
+  ).join('');
 });
 
 socket.on('game_reset', () => {
