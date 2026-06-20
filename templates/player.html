@@ -40,25 +40,19 @@
     gap: 24px;
   }
   .join-logo {
-    font-size: 3rem;
+    font-size: 2.8rem;
     font-weight: 900;
-    letter-spacing: -2px;
+    letter-spacing: -1px;
     text-align: center;
-    line-height: 1.1;
   }
   .join-logo span { color: var(--accent); }
-  .join-subtitle {
-    color: var(--muted);
-    font-size: 0.9rem;
-    text-align: center;
-  }
   .join-input {
     width: 100%;
-    max-width: 300px;
+    max-width: 280px;
     background: var(--card);
     border: 2px solid #2a2a4a;
     border-radius: 12px;
-    padding: 16px 18px;
+    padding: 16px;
     color: var(--text);
     font-size: 1.1rem;
     font-family: inherit;
@@ -69,7 +63,7 @@
   .join-input:focus { border-color: var(--teal); }
   .join-btn {
     width: 100%;
-    max-width: 300px;
+    max-width: 280px;
     background: var(--accent);
     color: white;
     border: none;
@@ -88,108 +82,38 @@
     flex: 1;
     display: none;
     flex-direction: column;
+    padding: 16px;
+    gap: 16px;
   }
 
   header {
     background: var(--surface);
-    padding: 12px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 10px;
     border-bottom: 2px solid var(--accent);
-    flex-shrink: 0;
+    text-align: center;
   }
-  .header-name { font-weight: 700; font-size: 0.95rem; }
-  .header-title { font-size: 0.8rem; color: var(--muted); }
-  .bingo-count {
-    background: var(--teal);
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 0.8rem;
-    font-weight: 700;
-  }
+  .player-name { font-weight: 700; font-size: 1.1rem; }
+  .game-title { font-size: 0.8rem; color: var(--muted); }
 
-  /* ── 현재 질문 배너 ── */
+  /* 현재 질문 */
   #questionBanner {
     background: var(--card);
-    border-bottom: 1px solid #2a2a4a;
-    padding: 14px 18px;
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    padding: 16px;
     display: none;
-    flex-shrink: 0;
   }
   #questionBanner.visible { display: block; }
-  .q-label-small {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
-  .q-text-main {
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1.4;
-  }
+  .q-num { font-size: 0.75rem; color: var(--gold); letter-spacing: 1px; margin-bottom: 6px; font-weight: 700; }
+  .q-text { font-size: 1.4rem; font-weight: 900; line-height: 1.3; }
 
-  /* ── 빙고판 ── */
-  .bingo-wrap {
-    padding: 16px;
-    flex-shrink: 0;
-  }
-  .bingo-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 5px;
-    max-width: 360px;
-    margin: 0 auto;
-  }
-  .bingo-cell {
-    aspect-ratio: 1;
-    background: var(--card);
-    border: 1.5px solid #2a2a4a;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1rem;
-    transition: all 0.3s;
-    position: relative;
-  }
-  .bingo-cell.cleared {
-    background: var(--teal);
-    border-color: var(--teal);
-    color: white;
-  }
-  .bingo-cell.cleared::after {
-    content: '✓';
-    position: absolute;
-    font-size: 1.4rem;
-    opacity: 0.3;
-  }
-  .bingo-cell.free {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 900;
-  }
-  .bingo-cell.new-cleared {
-    animation: popIn 0.4s ease;
-  }
-  @keyframes popIn {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); background: var(--gold); }
-    100% { transform: scale(1); }
-  }
-
-  /* ── 답변 입력 영역 ── */
+  /* 답변 영역 */
   #answerArea {
     flex: 1;
-    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 
   /* VS 버튼 */
@@ -199,22 +123,21 @@
   }
   .vs-btn {
     flex: 1;
-    padding: 16px 12px;
+    padding: 18px;
     border-radius: 12px;
     border: 2px solid #2a2a4a;
     background: var(--card);
     color: var(--text);
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
     transition: all 0.2s;
-    text-align: center;
   }
   .vs-btn:hover { border-color: var(--accent); }
   .vs-btn.selected { background: var(--accent); border-color: var(--accent); }
 
-  /* 텍스트 입력 */
+  /* 텍스트 답변 */
   .text-input-wrap {
     display: flex;
     gap: 8px;
@@ -224,9 +147,9 @@
     background: var(--card);
     border: 2px solid #2a2a4a;
     border-radius: 10px;
-    padding: 14px 16px;
+    padding: 14px;
     color: var(--text);
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-family: inherit;
     outline: none;
     transition: border-color 0.2s;
@@ -236,9 +159,9 @@
     background: var(--teal);
     border: none;
     border-radius: 10px;
-    padding: 0 20px;
+    padding: 0 18px;
     color: white;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: opacity 0.2s;
   }
@@ -248,72 +171,11 @@
   .waiting-msg {
     text-align: center;
     color: var(--muted);
-    font-size: 0.9rem;
-    padding: 20px;
+    padding: 24px;
+    font-size: 1rem;
   }
 
-  /* ── 빙고 완성 오버레이 ── */
-  #bingoOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-    gap: 16px;
-  }
-  #bingoOverlay.show { display: flex; }
-  .bingo-text {
-    font-size: 5rem;
-    font-weight: 900;
-    color: var(--gold);
-    animation: bingoPop 0.5s ease;
-    letter-spacing: -3px;
-  }
-  .bingo-sub { color: var(--text); font-size: 1.1rem; }
-  .bingo-close {
-    background: var(--card);
-    border: 1px solid #2a2a4a;
-    color: var(--muted);
-    padding: 10px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.9rem;
-    margin-top: 8px;
-  }
-  @keyframes bingoPop {
-    0% { transform: scale(0.3); opacity: 0; }
-    70% { transform: scale(1.15); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  /* ── 상대방 빙고 토스트 ── */
-  #otherBingoToast {
-    position: fixed;
-    top: 70px; left: 50%;
-    transform: translateX(-50%) translateY(-10px);
-    background: var(--surface);
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    padding: 10px 22px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    opacity: 0;
-    transition: all 0.3s;
-    pointer-events: none;
-    z-index: 100;
-    white-space: nowrap;
-  }
-  #otherBingoToast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  /* 게임 리셋 화면 */
+  /* 리셋 화면 */
   #resetScreen {
     flex: 1;
     display: none;
@@ -321,17 +183,14 @@
     align-items: center;
     justify-content: center;
     gap: 16px;
-    padding: 32px;
     text-align: center;
   }
-  #resetScreen h2 { font-size: 1.5rem; font-weight: 900; }
-  #resetScreen p { color: var(--muted); }
   .rejoin-btn {
     background: var(--accent);
     color: white;
     border: none;
     border-radius: 10px;
-    padding: 14px 32px;
+    padding: 14px 28px;
     font-size: 1rem;
     font-weight: 700;
     font-family: inherit;
@@ -344,7 +203,6 @@
 <!-- 입장 화면 -->
 <div id="joinScreen">
   <div class="join-logo">대청부<br><span>빙고</span></div>
-  <p class="join-subtitle">닉네임을 입력하고 게임에 참여하세요!</p>
   <input class="join-input" id="nameInput" type="text" placeholder="이름 입력" maxlength="10"
     onkeydown="if(event.key==='Enter') joinGame()">
   <button class="join-btn" onclick="joinGame()">입장하기</button>
@@ -353,54 +211,31 @@
 <!-- 게임 화면 -->
 <div id="gameScreen">
   <header>
-    <div>
-      <div class="header-name" id="myName"></div>
-      <div class="header-title">대청부 빙고 2026</div>
-    </div>
-    <div class="bingo-count" id="clearedCount">0 / 25</div>
+    <div class="player-name" id="myName"></div>
+    <div class="game-title">대청부 빙고 2026</div>
   </header>
 
   <div id="questionBanner">
-    <div class="q-label-small" id="qLabelSmall"></div>
-    <div class="q-text-main" id="qTextMain"></div>
-  </div>
-
-  <div class="bingo-wrap">
-    <div class="bingo-grid" id="bingoGrid"></div>
+    <div class="q-num" id="qNum"></div>
+    <div class="q-text" id="qText"></div>
   </div>
 
   <div id="answerArea">
-    <div class="waiting-msg" id="waitingMsg">번호가 불릴 때까지 기다려주세요 👀</div>
+    <div class="waiting-msg">번호가 불릴 때까지 기다려주세요 👀</div>
   </div>
 </div>
 
-<!-- 게임 리셋 화면 -->
+<!-- 리셋 화면 -->
 <div id="resetScreen">
   <h2>게임이 초기화됐어요</h2>
   <p>운영자가 게임을 새로 시작했습니다.</p>
   <button class="rejoin-btn" onclick="showJoin()">다시 입장하기</button>
 </div>
 
-<!-- 빙고 완성 오버레이 -->
-<div id="bingoOverlay">
-  <div class="bingo-text">BINGO!</div>
-  <div class="bingo-sub">🎉 빙고 완성! 축하합니다!</div>
-  <button class="bingo-close" onclick="document.getElementById('bingoOverlay').classList.remove('show')">계속 진행</button>
-</div>
-
-<!-- 상대방 빙고 토스트 -->
-<div id="otherBingoToast"></div>
-
 <script>
 const socket = io();
-const TYPE_LABELS = {
-  quiz: '📝 퀴즈', choice: '🙋 나는 어떤 사람?',
-  open: '💬 자유 답변', deep: '🌊 깊은 질문', vs: '⚡ 양자택일'
-};
 
 let myName = '';
-let myBoard = [];
-let myCleared = new Set();
 let currentQ = null;
 let voted = false;
 let answered = false;
@@ -420,32 +255,6 @@ function showJoin() {
   document.getElementById('joinScreen').style.display = 'flex';
 }
 
-// ── 빙고판 렌더 ──
-function renderBoard() {
-  const grid = document.getElementById('bingoGrid');
-  grid.innerHTML = '';
-  myBoard.forEach((num, idx) => {
-    const cell = document.createElement('div');
-    cell.className = 'bingo-cell';
-    cell.id = `cell-${num}`;
-    if (idx === 12) {
-      cell.classList.add('free');
-      cell.textContent = 'FREE';
-    } else {
-      cell.textContent = num;
-      if (myCleared.has(num)) cell.classList.add('cleared');
-    }
-    grid.appendChild(cell);
-  });
-  updateCount();
-}
-
-function updateCount() {
-  const total = myCleared.size + 1; // FREE 포함
-  document.getElementById('clearedCount').textContent = `${total} / 25`;
-}
-
-// ── 질문 표시 ──
 function showQuestion(num, q) {
   currentQ = { num, ...q };
   voted = false;
@@ -453,11 +262,11 @@ function showQuestion(num, q) {
 
   const banner = document.getElementById('questionBanner');
   banner.classList.add('visible');
-  document.getElementById('qLabelSmall').textContent = TYPE_LABELS[q.type] + ` · #${num}번`;
-  document.getElementById('qTextMain').textContent = q.text;
+  document.getElementById('qNum').textContent = `#${num}번`;
+  document.getElementById('qText').textContent = q.text;
 
   const area = document.getElementById('answerArea');
-  document.getElementById('waitingMsg').style.display = 'none';
+  document.getElementById('answerArea').innerHTML = '';
 
   if (q.type === 'vs' || q.type === 'choice') {
     area.innerHTML = `<div class="vs-buttons">
@@ -497,45 +306,15 @@ function sendAnswer() {
   input.placeholder = '답변 전송 완료!';
 }
 
-// ── 소켓 이벤트 ──
-socket.on('init', ({ board, cleared, current_q, question }) => {
-  myBoard = board;
-  myCleared = new Set(cleared);
-  renderBoard();
-  if (current_q && question) {
-    showQuestion(current_q, question);
-  }
-});
-
+// 소켓 이벤트
 socket.on('question_opened', ({ num, question }) => {
   showQuestion(num, question);
 });
 
 socket.on('number_cleared', ({ num }) => {
-  myCleared.add(num);
-  const cell = document.getElementById(`cell-${num}`);
-  if (cell && !cell.classList.contains('free')) {
-    cell.classList.add('cleared', 'new-cleared');
-    setTimeout(() => cell.classList.remove('new-cleared'), 500);
-  }
-  updateCount();
-
-  // 질문 배너 초기화
   document.getElementById('questionBanner').classList.remove('visible');
-  document.getElementById('answerArea').innerHTML =
-    `<div class="waiting-msg" id="waitingMsg">번호가 불릴 때까지 기다려주세요 👀</div>`;
+  document.getElementById('answerArea').innerHTML = '<div class="waiting-msg">번호가 불릴 때까지 기다려주세요 👀</div>';
   currentQ = null;
-});
-
-socket.on('bingo_alert', ({ name }) => {
-  if (name === myName) {
-    document.getElementById('bingoOverlay').classList.add('show');
-  } else {
-    const toast = document.getElementById('otherBingoToast');
-    toast.textContent = `🎉 ${name} 빙고!`;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
 });
 
 socket.on('game_reset', () => {

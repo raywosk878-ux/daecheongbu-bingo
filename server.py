@@ -133,9 +133,19 @@ def on_vote_vs(data):
     game_state['vs_votes'][sid] = option
     # 집계
     counts = {}
-    for v in game_state['vs_votes'].values():
+    voters = {}
+    for sid_key, v in game_state['vs_votes'].items():
         counts[v] = counts.get(v, 0) + 1
-    emit('vs_result', {'votes': counts, 'voter': player['name'], 'choice': option}, broadcast=True)
+        if v not in voters:
+            voters[v] = []
+        voters[v].append(game_state['players'][sid_key]['name'])
+    
+    emit('vs_result', {
+        'votes': counts,
+        'voters': voters,
+        'voter': player['name'],
+        'choice': option
+    }, broadcast=True)
 
 @socketio.on('approve_answer')
 def on_approve_answer(data):
@@ -155,6 +165,50 @@ def on_approve_answer(data):
     
     emit('player_approved', {'player_sid': sid, 'player_name': player['name'], 'num': num}, broadcast=True)
     emit('scoreboard', _scoreboard(), broadcast=True)
+
+@socketio.on('spin_roulette')
+def on_spin_roulette(data):
+    num = int(data['num'])
+    q = QUESTIONS.get(num)
+    
+    # VS 질문이 아니면 무시
+    if not q or q['type'] not in ['vs', 'choice']:
+        return
+    
+    # 현재 VS 투표 데이터
+    voters = {}
+    for sid, option in game_state['vs_votes'].items():
+        if sid in game_state['players']:
+            name = game_state['players'][sid]['name']
+            if option not in voters:
+                voters[option] = []
+            voters[option].append({'name': name, 'sid': sid})
+    
+    # 모든 답변자 리스트
+    all_voters = []
+    for option_voters in voters.values():
+        all_voters.extend(option_voters)
+    
+    if not all_voters:
+        return
+    
+    # 랜덤 선택
+    import random
+    winner = random.choice(all_voters)
+    winner_name = winner['name']
+    winner_choice = None
+    
+    # 우승자의 선택 찾기
+    for option, names in voters.items():
+        if any(v['name'] == winner_name for v in names):
+            winner_choice = option
+            break
+    
+    emit('roulette_result', {
+        'winner': winner_name,
+        'choice': winner_choice,
+        'num': num
+    }, broadcast=True)
 
 @socketio.on('clear_number')
 def on_clear_number(data):
