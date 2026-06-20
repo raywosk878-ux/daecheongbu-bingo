@@ -374,10 +374,21 @@ function handleClick() {
     drawNumber();
   } else if (phase === 'drawn') {
     revealQuestion();
+  } else if (phase === 'answer_pending') {
+    revealAnswer();
   } else if (phase === 'question') {
     if (drawnNums.length >= 25) showAllDone();
     else drawNumber();
   }
+}
+
+function revealAnswer() {
+  const ansEl = document.getElementById('qAnswer');
+  ansEl.textContent = `📌 정답: ${currentQuestion.answer}`;
+  ansEl.style.display = 'block';
+  document.getElementById('clickHint').textContent =
+    drawnNums.length >= 25 ? '모든 번호 완료!' : '클릭하면 다음 번호 추첨 →';
+  phase = 'question';
 }
 
 document.addEventListener('keydown', (e) => {
@@ -429,12 +440,8 @@ function revealQuestion() {
   document.getElementById('qText').textContent = q.text;
 
   const ansEl = document.getElementById('qAnswer');
-  if (q.answer) {
-    ansEl.textContent = `📌 정답: ${q.answer}`;
-    ansEl.style.display = 'block';
-  } else {
-    ansEl.style.display = 'none';
-  }
+  ansEl.style.display = 'none';
+  ansEl.textContent = '';
 
   const feed = document.getElementById('answersFeed');
   feed.innerHTML = '<div class="feed-title">LIVE 답변</div>';
@@ -460,10 +467,16 @@ function revealQuestion() {
   drawnNums.push(currentNum);
   updateDrawnDisplay();
 
-  document.getElementById('clickHint').textContent =
-    drawnNums.length >= 25 ? '모든 번호 완료!' : '클릭하면 다음 번호 추첨 →';
+  // 정답이 있는 문제는 한 번 더 클릭해야 정답 공개
+  if (q.answer) {
+    document.getElementById('clickHint').textContent = '클릭하면 정답 공개 →';
+    phase = 'answer_pending';
+  } else {
+    document.getElementById('clickHint').textContent =
+      drawnNums.length >= 25 ? '모든 번호 완료!' : '클릭하면 다음 번호 추첨 →';
+    phase = 'question';
+  }
 
-  phase = 'question';
   socket.emit('open_question', { num: currentNum });
 }
 
