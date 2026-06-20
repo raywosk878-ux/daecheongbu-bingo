@@ -24,23 +24,24 @@
     background: var(--bg);
     color: var(--text);
     font-family: 'Noto Sans KR', sans-serif;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
-  /* ── 헤더 ── */
   header {
     background: var(--surface);
-    padding: 16px 24px;
+    padding: 14px 24px;
     border-bottom: 2px solid var(--accent);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
   }
-  header h1 { font-size: 1.4rem; font-weight: 900; }
+  header h1 { font-size: 1.3rem; font-weight: 900; }
   header h1 span { color: var(--accent); }
-  .header-info { display: flex; gap: 16px; align-items: center; }
+  .header-info { display: flex; gap: 12px; align-items: center; }
   .player-count {
     background: var(--accent);
     padding: 6px 16px;
@@ -48,140 +49,203 @@
     font-weight: 700;
     font-size: 0.9rem;
   }
+  .progress-badge {
+    background: var(--surface);
+    border: 1px solid var(--muted);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .btn-reset {
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+  }
+  .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── 메인 레이아웃 ── */
   main {
     display: grid;
-    grid-template-columns: 1.2fr 2fr 280px;
+    grid-template-columns: 2.5fr 280px;
     gap: 20px;
     padding: 20px;
     flex: 1;
     overflow: hidden;
   }
 
-  /* ── 왼쪽: 번호판 ── */
-  .numbers-section {
+  .stage {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    overflow: hidden;
   }
-  .numbers-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+
+  .main-display {
     flex: 1;
-    overflow-y: auto;
-  }
-  .num-btn {
-    aspect-ratio: 1;
     background: var(--card);
-    border: 2px solid #2a2a4a;
-    border-radius: 12px;
-    color: var(--text);
-    font-size: 1.6rem;
-    font-weight: 900;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-  }
-  .num-btn:hover:not(.cleared) {
-    border-color: var(--teal);
-    background: #1a2a3a;
-    transform: scale(1.05);
-  }
-  .num-btn.active {
-    border-color: var(--gold);
-    background: #2a1a00;
-    box-shadow: 0 0 20px rgba(245,166,35,0.5);
-  }
-  .num-btn.cleared {
-    background: #2a2a4a;
-    border-color: #333;
-    color: var(--muted);
-    cursor: default;
-    text-decoration: line-through;
-  }
-
-  /* ── 오른쪽: 질문 + 답변 ── */
-  .chat-section {
+    border-radius: 18px;
+    border: 1px solid #2a2a4a;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    background: var(--card);
-    border-radius: 14px;
-    padding: 20px;
-    border: 1px solid #2a2a4a;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .main-display:hover .click-hint { opacity: 1; }
+
+  .click-hint {
+    position: absolute;
+    bottom: 16px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    opacity: 0.6;
+    transition: opacity 0.2s;
   }
 
-  /* 현재 질문 */
-  .question-display {
-    background: var(--surface);
-    border-left: 4px solid var(--gold);
-    padding: 16px;
-    border-radius: 8px;
-  }
-  .q-num { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
-  .q-text {
-    font-size: 1.6rem;
+  .start-view { text-align: center; padding: 20px; }
+  .start-view .big-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .start-view h2 { font-size: 1.6rem; margin-bottom: 8px; }
+  .start-view p { color: var(--muted); font-size: 1rem; }
+
+  .drawing-view { text-align: center; display: none; }
+  .ball {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffd97a, var(--gold) 55%, #d4881a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
     font-weight: 900;
-    line-height: 1.3;
-    margin-bottom: 10px;
+    color: #5a3a00;
+    box-shadow: 0 10px 40px rgba(245,166,35,0.4), inset 0 -8px 20px rgba(0,0,0,0.2);
+    margin: 0 auto;
   }
-  .q-answer {
+  .ball.rolling { animation: shake 0.4s infinite; }
+  @keyframes shake {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(-8px,-4px) rotate(-8deg); }
+    50% { transform: translate(8px,4px) rotate(6deg); }
+    75% { transform: translate(-4px,6px) rotate(-4deg); }
+  }
+  .ball.revealed { animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes pop {
+    0% { transform: scale(0.3); }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  .drawing-label {
+    margin-top: 20px;
     font-size: 1.1rem;
-    color: var(--teal);
-    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 1px;
   }
-  .q-answer.hidden { display: none; }
 
-  /* VS 투표 현황 */
-  .vs-stats {
-    display: none;
-    gap: 12px;
+  .question-view { display: none; text-align: center; padding: 30px; width: 100%; }
+  .q-ball-mini {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffd97a, var(--gold) 55%, #d4881a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #5a3a00;
+    margin: 0 auto 20px;
   }
+  .q-type-label {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    padding: 4px 14px;
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+  }
+  .q-text {
+    font-size: 2.4rem;
+    font-weight: 900;
+    line-height: 1.35;
+    margin-bottom: 20px;
+  }
+  .q-answer { font-size: 1.4rem; color: var(--teal); font-weight: 700; }
+
+  .vs-stats { display: none; gap: 14px; margin-top: 24px; justify-content: center; }
   .vs-stats.visible { display: flex; }
   .vs-bar {
-    flex: 1;
+    min-width: 140px;
     background: var(--surface);
-    border-radius: 8px;
-    padding: 12px;
+    border-radius: 10px;
+    padding: 16px;
     text-align: center;
   }
-  .vs-bar .opt-name { font-size: 0.9rem; color: var(--muted); margin-bottom: 6px; }
-  .vs-bar .opt-count { font-size: 1.8rem; font-weight: 900; color: var(--gold); }
-  .vs-bar.winner { border: 2px solid var(--gold); }
+  .vs-bar .opt-name { font-size: 1rem; color: var(--muted); margin-bottom: 8px; }
+  .vs-bar .opt-count { font-size: 2.2rem; font-weight: 900; color: var(--gold); }
+  .vs-bar.winner { border: 2px solid var(--gold); box-shadow: 0 0 16px rgba(245,166,35,0.3); }
+  .vs-mid { display: flex; align-items: center; font-weight: 900; color: var(--muted); font-size: 1.2rem; }
 
-  /* 룰렛 버튼 */
+  .roulette-zone { display: none; margin-top: 24px; flex-direction: column; align-items: center; gap: 16px; }
+  .roulette-zone.visible { display: flex; }
   .roulette-btn {
     background: var(--accent);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 1rem;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 1.1rem;
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
     transition: opacity 0.2s;
-    display: none;
   }
-  .roulette-btn.visible { display: block; }
   .roulette-btn:hover { opacity: 0.85; }
-  .roulette-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .roulette-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* 답변 피드 */
+  .roulette-spinner {
+    display: none;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gold);
+    min-height: 50px;
+    align-items: center;
+  }
+  .roulette-spinner.spinning { display: flex; }
+
+  .roulette-result { display: none; text-align: center; animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .roulette-result.show { display: block; }
+  .roulette-winner { font-size: 2rem; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+  .roulette-choice { font-size: 1.5rem; color: var(--teal); font-weight: 700; }
+
   .answers-feed {
-    flex: 1;
+    height: 150px;
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid #2a2a4a;
+    padding: 14px;
     overflow-y: auto;
-    border-top: 1px solid #2a2a4a;
-    padding-top: 12px;
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex-shrink: 0;
   }
+  .feed-title { font-size: 0.75rem; color: var(--gold); letter-spacing: 1.5px; font-weight: 700; margin-bottom: 4px; }
   .answer-item {
     background: var(--surface);
-    padding: 10px 12px;
+    padding: 8px 12px;
     border-radius: 8px;
     font-size: 1rem;
     animation: slideIn 0.3s ease;
@@ -194,64 +258,10 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* 룰렛 결과 */
-  .roulette-result {
-    background: var(--surface);
-    border: 2px solid var(--gold);
-    padding: 16px;
-    border-radius: 8px;
-    text-align: center;
-    display: none;
-    animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .roulette-result.show { display: block; }
-  .roulette-winner { font-size: 1.8rem; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
-  .roulette-choice { font-size: 1.3rem; color: var(--teal); }
-  @keyframes popIn {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  /* 스크롤바 */
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-
-  /* 대기 메시지 */
-  .waiting { text-align: center; color: var(--muted); padding: 20px; }
-
-  /* ── 우측 사이드바 ── */
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    overflow-y: auto;
-  }
-  .sidebar-section {
-    background: var(--card);
-    border-radius: 10px;
-    padding: 14px;
-    border: 1px solid #2a2a4a;
-  }
-  .sidebar-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 1.5px;
-    margin-bottom: 10px;
-  }
-  .player-item, .score-item {
+  .sidebar { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+  .sidebar-section { background: var(--card); border-radius: 12px; padding: 14px; border: 1px solid #2a2a4a; }
+  .sidebar-title { font-size: 0.75rem; font-weight: 700; color: var(--gold); letter-spacing: 1.5px; margin-bottom: 10px; }
+  .player-item {
     background: var(--surface);
     padding: 8px 10px;
     border-radius: 6px;
@@ -261,9 +271,27 @@
     align-items: center;
     gap: 6px;
   }
-  .player-item:last-child, .score-item:last-child { margin-bottom: 0; }
+  .player-item:last-child { margin-bottom: 0; }
   .player-dot { width: 6px; height: 6px; background: var(--teal); border-radius: 50%; }
-  .score-badge { margin-left: auto; background: var(--teal); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
+
+  .drawn-numbers { display: flex; flex-wrap: wrap; gap: 6px; }
+  .drawn-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -271,51 +299,60 @@
 <header>
   <h1>대청부 빙고 <span>운영자</span></h1>
   <div class="header-info">
+    <div class="progress-badge"><span id="drawnCount">0</span> / 25</div>
     <div class="player-count">👥 <span id="playerCount">0</span>명</div>
+    <button class="btn-reset" onclick="resetGame()">초기화</button>
   </div>
 </header>
 
 <main>
-  <!-- 왼쪽: 번호판 -->
-  <div class="numbers-section">
-    <div class="numbers-grid" id="numbersGrid"></div>
-  </div>
+  <div class="stage">
+    <div class="main-display" id="mainDisplay" onclick="handleClick()">
+      <div class="start-view" id="startView">
+        <div class="big-emoji">🎱</div>
+        <h2>번호를 추첨하세요</h2>
+        <p>화면을 클릭하거나 스페이스바를 누르세요</p>
+      </div>
 
-  <!-- 오른쪽: 질문 + 답변 채팅 -->
-  <div class="chat-section">
-    <!-- 현재 질문 -->
-    <div class="question-display" id="questionDisplay">
-      <div class="waiting">번호를 선택해주세요</div>
+      <div class="drawing-view" id="drawingView">
+        <div class="ball" id="ball">?</div>
+        <div class="drawing-label" id="drawingLabel">추첨 중...</div>
+      </div>
+
+      <div class="question-view" id="questionView">
+        <div class="q-ball-mini" id="qBallMini"></div>
+        <div class="q-type-label" id="qTypeLabel"></div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-answer" id="qAnswer"></div>
+
+        <div class="vs-stats" id="vsStats"></div>
+
+        <div class="roulette-zone" id="rouletteZone">
+          <button class="roulette-btn" id="rouletteBtn" onclick="event.stopPropagation(); spinRoulette()">🎡 참여자 룰렛 돌리기</button>
+          <div class="roulette-spinner" id="rouletteSpinner"></div>
+          <div class="roulette-result" id="rouletteResult">
+            <div class="roulette-winner" id="rouletteWinner"></div>
+            <div class="roulette-choice" id="rouletteChoice"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="click-hint" id="clickHint">클릭 또는 스페이스바 →</div>
     </div>
 
-    <!-- VS 투표 현황 -->
-    <div class="vs-stats" id="vsStats"></div>
-
-    <!-- 룰렛 버튼 -->
-    <button class="roulette-btn" id="rouletteBtn" onclick="spinRoulette()">🎡 룰렛 시작!</button>
-
-    <!-- 룰렛 결과 -->
-    <div class="roulette-result" id="rouletteResult">
-      <div class="roulette-winner" id="rouletteWinner"></div>
-      <div class="roulette-choice" id="rouletteChoice"></div>
+    <div class="answers-feed" id="answersFeed">
+      <div class="feed-title">LIVE 답변</div>
     </div>
-
-    <!-- 답변 피드 -->
-    <div class="answers-feed" id="answersFeed"></div>
   </div>
 
-  <!-- 우측 사이드바 -->
   <div class="sidebar">
-    <!-- 접속자 -->
     <div class="sidebar-section">
       <div class="sidebar-title">접속 중</div>
       <div id="playerList"></div>
     </div>
-    
-    <!-- 스코어보드 -->
     <div class="sidebar-section">
-      <div class="sidebar-title">스코어</div>
-      <div id="scoreList"></div>
+      <div class="sidebar-title">뽑힌 번호</div>
+      <div class="drawn-numbers" id="drawnNumbers"></div>
     </div>
   </div>
 </main>
@@ -323,123 +360,179 @@
 <script>
 const socket = io();
 const QUESTIONS = {{ questions | tojson }};
+const TYPE_LABELS = {
+  quiz: '📝 퀴즈', choice: '🙋 양자택일',
+  open: '💬 자유 답변', deep: '🌊 깊은 질문', vs: '⚡ 양자택일'
+};
 
+let phase = 'idle';
 let currentNum = null;
-let clearedNums = new Set();
 let currentQuestion = null;
+let drawnNums = [];
 
-// 번호판 생성
-function buildNumbers() {
-  const grid = document.getElementById('numbersGrid');
-  grid.innerHTML = '';
-  for (let n = 1; n <= 25; n++) {
-    const btn = document.createElement('button');
-    btn.className = 'num-btn';
-    btn.textContent = n;
-    btn.id = `num-${n}`;
-    btn.onclick = () => openQuestion(n);
-    grid.appendChild(btn);
+function handleClick() {
+  if (phase === 'idle') {
+    drawNumber();
+  } else if (phase === 'drawn') {
+    revealQuestion();
+  } else if (phase === 'question') {
+    if (drawnNums.length >= 25) showAllDone();
+    else drawNumber();
   }
 }
 
-function openQuestion(num) {
-  if (clearedNums.has(num)) return;
-  currentNum = num;
-  socket.emit('open_question', { num });
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') { e.preventDefault(); handleClick(); }
+});
+
+function drawNumber() {
+  const remaining = [];
+  for (let i = 1; i <= 25; i++) {
+    if (!drawnNums.includes(i)) remaining.push(i);
+  }
+  if (remaining.length === 0) { showAllDone(); return; }
+
+  const picked = remaining[Math.floor(Math.random() * remaining.length)];
+
+  document.getElementById('startView').style.display = 'none';
+  document.getElementById('questionView').style.display = 'none';
+  document.getElementById('drawingView').style.display = 'block';
+  document.getElementById('clickHint').textContent = '추첨 중...';
+
+  const ball = document.getElementById('ball');
+  ball.className = 'ball rolling';
+  document.getElementById('drawingLabel').textContent = '추첨 중...';
+
+  const rollInterval = setInterval(() => {
+    ball.textContent = remaining[Math.floor(Math.random() * remaining.length)];
+  }, 80);
+
+  setTimeout(() => {
+    clearInterval(rollInterval);
+    ball.textContent = picked;
+    ball.className = 'ball revealed';
+    document.getElementById('drawingLabel').textContent = `${picked}번 당첨!`;
+    document.getElementById('clickHint').textContent = '클릭하면 질문 공개 →';
+    currentNum = picked;
+    phase = 'drawn';
+  }, 1800);
 }
 
-function showQuestion(num, q) {
+function revealQuestion() {
+  const q = QUESTIONS[currentNum];
   currentQuestion = q;
-  const display = document.getElementById('questionDisplay');
-  const qNum = document.getElementById('num-' + num);
-  
-  // 활성 표시
-  document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('active'));
-  if (qNum) qNum.classList.add('active');
 
-  let html = `<div class="q-num">#${num}번</div>`;
-  html += `<div class="q-text">${q.text}</div>`;
-  
+  document.getElementById('drawingView').style.display = 'none';
+  document.getElementById('questionView').style.display = 'block';
+
+  document.getElementById('qBallMini').textContent = currentNum;
+  document.getElementById('qTypeLabel').textContent = TYPE_LABELS[q.type];
+  document.getElementById('qText').textContent = q.text;
+
+  const ansEl = document.getElementById('qAnswer');
   if (q.answer) {
-    html += `<div class="q-answer">📌 정답: ${q.answer}</div>`;
+    ansEl.textContent = `📌 정답: ${q.answer}`;
+    ansEl.style.display = 'block';
+  } else {
+    ansEl.style.display = 'none';
   }
 
-  display.innerHTML = html;
+  const feed = document.getElementById('answersFeed');
+  feed.innerHTML = '<div class="feed-title">LIVE 답변</div>';
 
-  // 초기화
-  document.getElementById('answersFeed').innerHTML = '';
-  document.getElementById('rouletteResult').classList.remove('show');
-  
-  // VS 투표 현황
   const vsStats = document.getElementById('vsStats');
-  const rouletteBtn = document.getElementById('rouletteBtn');
-  
+  const rouletteZone = document.getElementById('rouletteZone');
+  document.getElementById('rouletteResult').classList.remove('show');
+  document.getElementById('rouletteSpinner').classList.remove('spinning');
+  document.getElementById('rouletteBtn').disabled = false;
+  document.getElementById('rouletteBtn').style.display = 'block';
+
   if (q.type === 'vs' || q.type === 'choice') {
     vsStats.classList.add('visible');
-    rouletteBtn.classList.add('visible');
-    vsStats.innerHTML = q.options.map(opt => 
-      `<div class="vs-bar"><div class="opt-name">${opt}</div><div class="opt-count">0</div></div>`
+    rouletteZone.classList.add('visible');
+    vsStats.innerHTML = q.options.map((opt, i) =>
+      `${i > 0 ? '<div class="vs-mid">VS</div>' : ''}<div class="vs-bar"><div class="opt-name">${opt}</div><div class="opt-count">0</div></div>`
     ).join('');
   } else {
     vsStats.classList.remove('visible');
-    rouletteBtn.classList.remove('visible');
+    rouletteZone.classList.remove('visible');
   }
+
+  drawnNums.push(currentNum);
+  updateDrawnDisplay();
+
+  document.getElementById('clickHint').textContent =
+    drawnNums.length >= 25 ? '모든 번호 완료!' : '클릭하면 다음 번호 추첨 →';
+
+  phase = 'question';
+  socket.emit('open_question', { num: currentNum });
 }
 
 function spinRoulette() {
-  if (!currentNum) return;
   document.getElementById('rouletteBtn').disabled = true;
   socket.emit('spin_roulette', { num: currentNum });
 }
 
-// 소켓 이벤트
-socket.on('question_opened', ({ num, question }) => {
-  showQuestion(num, question);
-});
+function showAllDone() {
+  document.getElementById('drawingView').style.display = 'none';
+  document.getElementById('questionView').style.display = 'none';
+  const sv = document.getElementById('startView');
+  sv.style.display = 'block';
+  sv.innerHTML = '<div class="big-emoji">🎉</div><h2>모든 번호가 나왔습니다!</h2><p>수고하셨습니다</p>';
+  document.getElementById('clickHint').textContent = '';
+  phase = 'done';
+}
+
+function updateDrawnDisplay() {
+  document.getElementById('drawnCount').textContent = drawnNums.length;
+  const container = document.getElementById('drawnNumbers');
+  container.innerHTML = drawnNums.map(n => `<div class="drawn-num">${n}</div>`).join('');
+}
+
+function resetGame() {
+  if (confirm('게임을 초기화할까요? 모든 참여자가 나가게 됩니다.')) {
+    socket.emit('reset_game');
+  }
+}
 
 socket.on('new_answer', ({ name, text }) => {
   const feed = document.getElementById('answersFeed');
   const item = document.createElement('div');
   item.className = 'answer-item';
   item.innerHTML = `<span class="answer-name">${name}</span><span class="answer-sep">:</span> ${text}`;
-  feed.prepend(item);
+  feed.appendChild(item);
+  feed.scrollTop = feed.scrollHeight;
 });
 
-socket.on('vs_result', ({ votes, voters }) => {
+socket.on('vs_result', ({ votes }) => {
   if (!currentQuestion || (currentQuestion.type !== 'vs' && currentQuestion.type !== 'choice')) return;
-  
-  const vsStats = document.getElementById('vsStats');
   const options = currentQuestion.options;
   const maxVotes = Math.max(...options.map(opt => votes[opt] || 0));
-  
-  vsStats.innerHTML = options.map(opt => {
+  document.getElementById('vsStats').innerHTML = options.map((opt, i) => {
     const count = votes[opt] || 0;
     const isWinner = count === maxVotes && count > 0;
-    return `
-      <div class="vs-bar ${isWinner ? 'winner' : ''}">
-        <div class="opt-name">${opt}</div>
-        <div class="opt-count">${count}</div>
-      </div>
-    `;
+    return `${i > 0 ? '<div class="vs-mid">VS</div>' : ''}<div class="vs-bar ${isWinner ? 'winner' : ''}"><div class="opt-name">${opt}</div><div class="opt-count">${count}</div></div>`;
   }).join('');
 });
 
-socket.on('roulette_result', ({ winner, choice, num }) => {
+socket.on('roulette_result', ({ winner, choice }) => {
+  const spinner = document.getElementById('rouletteSpinner');
   const result = document.getElementById('rouletteResult');
-  document.getElementById('rouletteWinner').textContent = `🎡 ${winner}`;
-  document.getElementById('rouletteChoice').textContent = `선택: ${choice}`;
-  result.classList.add('show');
-  document.getElementById('rouletteBtn').disabled = false;
-});
+  document.getElementById('rouletteBtn').style.display = 'none';
 
-socket.on('number_cleared', ({ num }) => {
-  clearedNums.add(num);
-  const btn = document.getElementById(`num-${num}`);
-  if (btn) {
-    btn.classList.remove('active');
-    btn.classList.add('cleared');
-  }
-  currentNum = null;
+  spinner.classList.add('spinning');
+  const players = Array.from(document.querySelectorAll('.player-item')).map(el => el.textContent.trim());
+  const spinInterval = setInterval(() => {
+    spinner.textContent = players.length ? players[Math.floor(Math.random() * players.length)] : '...';
+  }, 100);
+
+  setTimeout(() => {
+    clearInterval(spinInterval);
+    spinner.classList.remove('spinning');
+    document.getElementById('rouletteWinner').textContent = `🎡 ${winner}`;
+    document.getElementById('rouletteChoice').textContent = `→ ${choice}`;
+    result.classList.add('show');
+  }, 2000);
 });
 
 socket.on('player_list', (players) => {
@@ -450,28 +543,22 @@ socket.on('player_list', (players) => {
   ).join('');
 });
 
-socket.on('scoreboard', (scores) => {
-  const list = document.getElementById('scoreList');
-  list.innerHTML = scores.map(s =>
-    `<div class="score-item">
-      <span>${s.name}</span>
-      <span class="score-badge">${s.count}</span>
-    </div>`
-  ).join('');
-});
-
 socket.on('game_reset', () => {
-  clearedNums = new Set();
+  phase = 'idle';
   currentNum = null;
   currentQuestion = null;
-  buildNumbers();
-  document.getElementById('questionDisplay').innerHTML = '<div class="waiting">번호를 선택해주세요</div>';
-  document.getElementById('answersFeed').innerHTML = '';
-  document.getElementById('rouletteResult').classList.remove('show');
+  drawnNums = [];
+  updateDrawnDisplay();
+  document.getElementById('drawingView').style.display = 'none';
+  document.getElementById('questionView').style.display = 'none';
+  const sv = document.getElementById('startView');
+  sv.style.display = 'block';
+  sv.innerHTML = '<div class="big-emoji">🎱</div><h2>번호를 추첨하세요</h2><p>화면을 클릭하거나 스페이스바를 누르세요</p>';
+  document.getElementById('clickHint').textContent = '클릭 또는 스페이스바 →';
+  document.getElementById('answersFeed').innerHTML = '<div class="feed-title">LIVE 답변</div>';
   document.getElementById('playerCount').textContent = '0';
+  document.getElementById('playerList').innerHTML = '';
 });
-
-buildNumbers();
 </script>
 </body>
 </html>
